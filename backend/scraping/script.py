@@ -9,6 +9,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
+# from backend.scripts.classify import classify_comments
+
+
 
 def remove_emojis(text):
     emoji_pattern = re.compile(
@@ -105,12 +108,13 @@ def scrape_youtube_comments(url, max_comments=100):
     finally:
         driver.quit()
 
-    save_comments_to_csv(list(comments))
-    return list(comments)[:max_comments]
+    return list(comments)
+    
 
 if __name__ == "__main__":
     video_url = input("Enter YouTube video URL: ")
     print("🔎 Scraping comments, please wait...\n")
     comments = scrape_youtube_comments(video_url)
-
-    print(f"\n✅ Scraping complete! {len(comments)} comments saved into 'youtube_comments.csv'.")
+    # classify_comments(comments)
+    print(comments)
+    
