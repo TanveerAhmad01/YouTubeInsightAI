@@ -9,9 +9,13 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
-# from backend.scripts.classify import classify_comments
 
+# Define output paths
+CSV_FILE = os.path.join("backend", "Data", "youtube_comments.csv")
+LOG_FILE = os.path.join("backend", "Data", "error_log.txt")
 
+# Ensure Data folder exists
+os.makedirs(os.path.dirname(CSV_FILE), exist_ok=True)
 
 def remove_emojis(text):
     emoji_pattern = re.compile(
@@ -32,18 +36,15 @@ def is_connected():
     except requests.ConnectionError:
         return False
 
-def save_comments_to_csv(comments, filename="youtube_comments.csv"):
-    file_exists = os.path.isfile(filename)
-
-    with open(filename, mode='a', newline='', encoding='utf-8') as file:
+def save_comments_to_csv(comments, filename=CSV_FILE):
+    with open(filename, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        if not file_exists:
-            writer.writerow(['Comment'])
+        writer.writerow(['Comment'])
         for comment in comments:
             writer.writerow([comment])
 
 def log_error(message):
-    with open("error_log.txt", "a", encoding='utf-8') as file:
+    with open(LOG_FILE, "a", encoding='utf-8') as file:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         file.write(f"[{timestamp}] {message}\n")
 
@@ -74,10 +75,7 @@ def scrape_youtube_comments(url, max_comments=100):
                 return list(comments)
 
             comment_elements = driver.find_elements(By.CSS_SELECTOR, "#content-text")
-
-            # Extract comments
             new_comments = [remove_emojis(elem.text) for elem in comment_elements if elem.text.strip()]
-
             previous_count = len(comments)
             comments.update(new_comments)
 
@@ -108,13 +106,16 @@ def scrape_youtube_comments(url, max_comments=100):
     finally:
         driver.quit()
 
-    return list(comments)
-    
+    save_comments_to_csv(list(comments))
+    return list(comments)[:max_comments]
 
 if __name__ == "__main__":
+    # Remove previous file if exists
+    if os.path.exists(CSV_FILE):
+        os.remove(CSV_FILE)
+
     video_url = input("Enter YouTube video URL: ")
     print("🔎 Scraping comments, please wait...\n")
     comments = scrape_youtube_comments(video_url)
-    # classify_comments(comments)
-    print(comments)
-    
+
+    print(f"\n✅ Scraping complete! {len(comments)} comments saved into '{CSV_FILE}'.")
