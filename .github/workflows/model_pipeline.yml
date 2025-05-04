@@ -26,12 +26,12 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run BERT sentiment pipeline
-      working-directory: backend/preprocessing
+      # working-directory: backend/preprocessing
       run: |
         python main.py
 
     - name: Load model
-      working-directory: backend/saved_models
+      # working-directory: backend/saved_models
       run: |
         python load_model.py
 
