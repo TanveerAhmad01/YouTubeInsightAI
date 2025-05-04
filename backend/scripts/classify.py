@@ -1,9 +1,9 @@
 import torch
 from transformers import BertTokenizer, BertForSequenceClassification
-
+import pandas as pd
 # Load the model
 model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=3)
-model.load_state_dict(torch.load("backend/model/bert_model.pkl", map_location=torch.device('cpu')))
+model.load_state_dict(torch.load("saved_models/bert_model.pkl", map_location=torch.device('cpu')))
 model.eval()
 
 # Load tokenizer
@@ -27,5 +27,19 @@ def classify_comments(comments):
     return sentiment_counts
 
 
+df = pd.read_csv('backend/Data/youtube_comments.csv')  # adjust the path if needed
+
+# Check if 'comment' column exists
+if 'Comment' not in df.columns:
+    raise ValueError("The CSV must contain a 'Comment' column.")
+
+# Extract comments
+comments = df['Comment'].dropna().astype(str).tolist()
+
+# Run sentiment classification
+results = classify_comments(comments)
+
+# Print result
+print("Sentiment Distribution:", results)
 # result = classify_comments(test_comments)
 # print(result)
