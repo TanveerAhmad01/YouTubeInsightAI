@@ -3,9 +3,9 @@ name: Run BERT Sentiment Pipeline
 on:
   push:
     branches:
-      - main  # Or whichever branch you want to trigger the action
+      - main
     paths:
-      - 'backend/Data/**'  # Make sure to adjust the paths if necessary
+      - 'backend/Data/**'
 
 jobs:
   run-pipeline:
@@ -18,7 +18,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
@@ -26,18 +26,20 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run BERT sentiment pipeline
+      working-directory: backend/preprocessing
       run: |
         python main.py
 
     - name: Load model and classify comments
+      working-directory: backend/saved_models
       run: |
-        python loadmodel.py
+        python load_model.py
 
     - name: Upload logs and results (Optional)
       if: always()
-      uses: actions/upload-artifact@v4  # Updated to use v4 of the artifact action
+      uses: actions/upload-artifact@v4
       with:
         name: training-results
         path: |
-          results/
-          logs/
+          backend/Data/results/
+          backend/Data/logs/
