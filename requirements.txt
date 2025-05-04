@@ -1,0 +1,7 @@
+pandas
+emoji
+scikit-learn
+torch==2.7.0
+transformers
+mlflow
+dagshub
