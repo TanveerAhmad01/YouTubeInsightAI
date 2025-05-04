@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Sentiment Analysis</title>
+</head>
+<body>
+    <h2>Enter YouTube Video URL</h2>
+    <form action="{{ url_for('get_url') }}" method="POST">
+        <input type="text" name="video_url" placeholder="Enter YouTube URL" required>
+        <input type="submit" value="Analyze">
+    </form>
+</body>
+</html>
