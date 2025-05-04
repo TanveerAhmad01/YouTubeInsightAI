@@ -3,11 +3,13 @@
 import torch
 from sklearn.model_selection import train_test_split
 from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from torch.utils.data import Dataset
 import mlflow
 import dagshub
 
+# Enable DagsHub logging
+dagshub.init(repo_owner='TanveerAhmad01', repo_name='YouTubeInsightAI', mlflow=True)
 
 def run_bert_sentiment_pipeline(df_cleaned, text_col, label_col, num_labels):
     # Step 1: Prepare data
@@ -89,27 +91,45 @@ def run_bert_sentiment_pipeline(df_cleaned, text_col, label_col, num_labels):
 
     # Print classification report
     eval_result = classification_report(y_true_labels, y_pred_labels)
+    report = classification_report(y_true_labels, y_pred_labels, output_dict=True)
+    accuracy = accuracy_score(y_true_labels, y_pred_labels)
     print(eval_result)
+
+    # Conditionally log to MLflow
+    log_to_mlflow(model, report, accuracy)
 
     return trainer, eval_result
 
 
-        #sava model logs into Mlflow
-    def log_to_mlflow(model, training_args, report, accuracy):
-        with mlflow.start_run():
-            # Log accuracy
-            mlflow.log_metric("accuracy", accuracy)
+def log_to_mlflow(model, report, accuracy):
+    accuracy_threshold = 0.80
+    metric_threshold = 0.70
+    required_labels = ['-1', '0', '1']
 
-            for label, metrics in report.items():
-                if isinstance(metrics, dict) and "precision" in metrics:
-                    mlflow.log_metric(f"{label}_precision", metrics["precision"])
-                    mlflow.log_metric(f"{label}_recall", metrics["recall"])
-                    mlflow.log_metric(f"{label}_f1-score", metrics["f1-score"])
+    if accuracy < accuracy_threshold:
+        print("❌ Model accuracy below 80%. Not logging to MLflow.")
+        return
 
-            # Log and register model
-            mlflow.pytorch.log_model(
-                model,
-                artifact_path="bert_model",
-                registered_model_name="bert-sentiment-model"
-            )
+    for label in required_labels:
+        metrics = report.get(label)
+        if not metrics:
+            print(f"❌ Metrics missing for class {label}. Not logging to MLflow.")
+            return
+        if any(metrics[metric] < metric_threshold for metric in ['precision', 'recall', 'f1-score']):
+            print(f"❌ One or more metrics below 70% for class {label}. Not logging to MLflow.")
+            return
 
+    with mlflow.start_run():
+        print("✅ Logging model to MLflow...")
+        mlflow.log_metric("accuracy", accuracy)
+        for label, metrics in report.items():
+            if isinstance(metrics, dict) and "precision" in metrics:
+                mlflow.log_metric(f"{label}_precision", metrics["precision"])
+                mlflow.log_metric(f"{label}_recall", metrics["recall"])
+                mlflow.log_metric(f"{label}_f1-score", metrics["f1-score"])
+
+        mlflow.pytorch.log_model(
+            model,
+            artifact_path="bert_model",
+            registered_model_name="bert-sentiment-model"
+        )
