@@ -5,41 +5,48 @@ on:
     branches:
       - main
     paths:
-      - 'backend/Data/**'
+      - 'backend/Data/**'  # Only trigger on changes to the 'backend/Data/' directory
+
+  workflow_dispatch:  # Allow manual triggering of the workflow
 
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
 
     steps:
+    # Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # Set up Python environment
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.11'  # Ensure the Python version matches your project requirements
 
+    # Install dependencies from requirements.txt
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    # Run the BERT sentiment pipeline
     - name: Run BERT sentiment pipeline
-      # working-directory: backend/preprocessing
       run: |
-        python main.py
+        python backend/preprocessing/main.py  # Assuming main.py is inside the backend folder
 
+    # Load the saved model (if necessary for further use)
     - name: Load model
-      # working-directory: backend/saved_models
       run: |
-        python load_model.py
+        python backend/saved_models/load_model.py  # Assuming load_model.py is in the backend folder
 
-    - name: Upload logs and results (Optional)
-      if: always()
+    # Upload logs and results (Optional, always triggered)
+    - name: Upload logs and results
+      if: always()  # Upload logs and results even if the workflow fails
       uses: actions/upload-artifact@v4
       with:
         name: training-results
         path: |
-          backend/Data/results/
-          backend/Data/logs/
+          backend/Data/results/  # Path for results
+          backend/Data/logs/  # Path for logs
+
