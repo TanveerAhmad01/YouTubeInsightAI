@@ -1,13 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>YouTubeInsightAI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTubeInsightAI - Comment Sentiment Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
-    <h1>YouTube Comment Sentiment Analyzer</h1>
-    <form action="{{ url_for('get_url') }}" method="post">
-        <input type="text" name="video_url" placeholder="Enter YouTube video URL" required>
-        <button type="submit">Go</button>
-    </form>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <header class="text-center mb-12">
+            <div class="flex items-center justify-center mb-4">
+                <i class="fab fa-youtube text-red-600 text-5xl mr-3"></i>
+                <h1 class="text-4xl font-bold text-gray-800">YouTubeInsightAI</h1>
+            </div>
+            <p class="text-gray-600 text-xl">Analyze sentiment in YouTube video comments</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">Enter a YouTube Video URL</h2>
+            
+            <form id="analyzeForm" action="{{ url_for('get_url') }}" method="post" class="space-y-6">
+                <div class="relative">
+                    <div class="flex rounded-md shadow-sm">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                            <i class="fas fa-link"></i>
+                        </span>
+                        <input 
+                            type="url" 
+                            name="video_url" 
+                            id="video_url" 
+                            class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300 p-4 border"
+                            placeholder="https://www.youtube.com/watch?v=..." 
+                            pattern="https?://(?:www\.)?youtube\.com/watch\?v=.+" 
+                            title="Please enter a valid YouTube video URL"
+                            required
+                        >
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">
+                        Example: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                    </p>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <button 
+                        type="submit" 
+                        id="submitBtn"
+                        class="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150"
+                    >
+                        <span id="btnText">Analyze Comments</span>
+                        <svg id="loadingIcon" class="animate-spin ml-2 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-4">
+                    <div class="bg-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-paste text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-lg mb-2">1. Paste URL</h3>
+                    <p class="text-gray-600">Enter the URL of any YouTube video you want to analyze</p>
+                </div>
+                <div class="text-center p-4">
+                    <div class="bg-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-robot text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-lg mb-2">2. AI Analysis</h3>
+                    <p class="text-gray-600">Our AI analyzes the sentiment of comments</p>
+                </div>
+                <div class="text-center p-4">
+                    <div class="bg-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-pie text-indigo-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-medium text-lg mb-2">3. View Results</h3>
+                    <p class="text-gray-600">Get detailed insights about audience sentiment</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>© 2023 YouTubeInsightAI. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('analyzeForm').addEventListener('submit', function() {
+            // Show loading state
+            document.getElementById('loadingIcon').classList.remove('hidden');
+            document.getElementById('btnText').textContent = 'Analyzing...';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').classList.add('opacity-75');
+        });
+    </script>
 </body>
 </html>

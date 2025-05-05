@@ -1,11 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Analysis Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTubeInsightAI - Analysis Result</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Function to determine sentiment color and icon
+        function setupSentiment() {
+            const sentiment = "{{ sentiment }}".toLowerCase();
+            const resultCard = document.getElementById('resultCard');
+            const sentimentIcon = document.getElementById('sentimentIcon');
+            const sentimentText = document.getElementById('sentimentText');
+            
+            if (sentiment.includes('positive')) {
+                resultCard.classList.add('bg-green-50', 'border-green-200');
+                sentimentIcon.classList.add('bg-green-100', 'text-green-600');
+                sentimentIcon.innerHTML = '<i class="fas fa-smile"></i>';
+                sentimentText.classList.add('text-green-700');
+            } else if (sentiment.includes('negative')) {
+                resultCard.classList.add('bg-red-50', 'border-red-200');
+                sentimentIcon.classList.add('bg-red-100', 'text-red-600');
+                sentimentIcon.innerHTML = '<i class="fas fa-frown"></i>';
+                sentimentText.classList.add('text-red-700');
+            } else if (sentiment.includes('neutral')) {
+                resultCard.classList.add('bg-yellow-50', 'border-yellow-200');
+                sentimentIcon.classList.add('bg-yellow-100', 'text-yellow-600');
+                sentimentIcon.innerHTML = '<i class="fas fa-meh"></i>';
+                sentimentText.classList.add('text-yellow-700');
+            } else {
+                resultCard.classList.add('bg-blue-50', 'border-blue-200');
+                sentimentIcon.classList.add('bg-blue-100', 'text-blue-600');
+                sentimentIcon.innerHTML = '<i class="fas fa-chart-bar"></i>';
+                sentimentText.classList.add('text-blue-700');
+            }
+        }
+    </script>
 </head>
-<body>
-    <h1>Analysis Result</h1>
-    <p>Predicted Sentiment: <strong>{{ sentiment }}</strong></p>
-    <a href="{{ url_for('index') }}">Analyze another video</a>
+<body class="bg-gray-100 min-h-screen" onload="setupSentiment()">
+    <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <header class="text-center mb-12">
+            <div class="flex items-center justify-center mb-4">
+                <i class="fab fa-youtube text-red-600 text-5xl mr-3"></i>
+                <h1 class="text-4xl font-bold text-gray-800">YouTubeInsightAI</h1>
+            </div>
+            <p class="text-gray-600 text-xl">Comment Sentiment Analysis Results</p>
+        </header>
+
+        <div id="resultCard" class="rounded-lg shadow-lg p-8 mb-8 border">
+            <h2 class="text-2xl font-semibold mb-8 text-gray-700 text-center">Analysis Complete</h2>
+            
+            <div class="flex flex-col items-center justify-center mb-8">
+                <div id="sentimentIcon" class="rounded-full w-24 h-24 flex items-center justify-center mb-4 text-4xl"></div>
+                <h3 class="text-2xl font-bold mb-2">Predicted Sentiment</h3>
+                <p id="sentimentText" class="text-3xl font-bold">{{ sentiment }}</p>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700">What This Means</h3>
+                <div class="space-y-4 text-gray-600">
+                    <p class="positive-explanation hidden">The comments on this video are predominantly positive. Viewers are expressing satisfaction, appreciation, or enjoyment.</p>
+                    <p class="negative-explanation hidden">The comments on this video are predominantly negative. Viewers are expressing dissatisfaction, criticism, or dislike.</p>
+                    <p class="neutral-explanation hidden">The comments on this video are predominantly neutral. Viewers are neither strongly positive nor negative in their expressions.</p>
+                    <p class="mixed-explanation hidden">The comments on this video show a mix of sentiments. There's a balance of positive, negative, and neutral expressions.</p>
+                    <p class="general-explanation">This analysis is based on natural language processing of the comments section. Individual comments may vary in sentiment.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{{ url_for('index') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                    <i class="fas fa-arrow-left mr-2"></i> Analyze Another Video
+                </a>
+                <button onclick="window.print()" class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                    <i class="fas fa-print mr-2"></i> Print Results
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-700">What's Next?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-indigo-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                            <i class="fas fa-chart-line text-indigo-600"></i>
+                        </div>
+                        <h3 class="font-medium text-lg">Track Over Time</h3>
+                    </div>
+                    <p class="text-gray-600">Analyze the same video periodically to track sentiment changes as new comments are added.</p>
+                </div>
+                <div class="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-indigo-100 rounded-full w-10 h-10 flex items-center justify-center mr-3">
+                            <i class="fas fa-video text-indigo-600"></i>
+                        </div>
+                        <h3 class="font-medium text-lg">Compare Videos</h3>
+                    </div>
+                    <p class="text-gray-600">Analyze multiple videos to compare audience sentiment across your content.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>© 2023 YouTubeInsightAI. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Show the appropriate explanation based on sentiment
+        document.addEventListener('DOMContentLoaded', function() {
+            const sentiment = "{{ sentiment }}".toLowerCase();
+            
+            if (sentiment.includes('positive')) {
+                document.querySelector('.positive-explanation').classList.remove('hidden');
+            } else if (sentiment.includes('negative')) {
+                document.querySelector('.negative-explanation').classList.remove('hidden');
+            } else if (sentiment.includes('neutral')) {
+                document.querySelector('.neutral-explanation').classList.remove('hidden');
+            } else {
+                document.querySelector('.mixed-explanation').classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
