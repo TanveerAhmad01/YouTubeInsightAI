@@ -5,3 +5,15 @@ torch==2.7.0
 transformers
 mlflow
 dagshub
+selenium
+beautifulsoup4
+flask
+datetime
+requests
+time
+re
+csv
+os
+tqdm
+flask
+flask_cors
