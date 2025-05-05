@@ -24,12 +24,10 @@ def get_url():
     if not video_url:
         return "No URL provided", 400
 
-    # Step 1: Scrape comments
     comments = scrape_youtube_comments(video_url)
 
-    # Step 2: Get sentiment result from classification model
     result_global = calling_result()
-
+    print(result_global)
     return redirect(url_for('show_result'))
 
 @app.route('/result')
